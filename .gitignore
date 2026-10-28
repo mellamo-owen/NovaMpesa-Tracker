@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.jks
+*.p12
+public_key.pem
+generate_keys.py
+admin_private_key.txt
