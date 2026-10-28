@@ -25,7 +25,8 @@ data class Transaction(
     val categoryId: Long?,
     val timestamp: Long, 
     val isLoan: Boolean = false,
-    val balance: Double? = null
+    val balance: Double? = null,
+    val transactionCost: Double = 0.0 // NEW: Tracks the Safaricom fee
 )
 
 @Dao interface AppStateDao {
@@ -45,7 +46,7 @@ data class Transaction(
     @Query("DELETE FROM transactions WHERE id = :id") suspend fun deleteById(id: Long)
 }
 
-@Database(entities = [AppState::class, Category::class, Transaction::class], version = 6, exportSchema = false)
+@Database(entities = [AppState::class, Category::class, Transaction::class], version = 8, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appStateDao(): AppStateDao
     abstract fun categoryDao(): CategoryDao
@@ -55,7 +56,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile private var INSTANCE: AppDatabase? = null
         fun get(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "clean_nova_v6.db")
+                INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "clean_nova_v8.db")
                     .fallbackToDestructiveMigration().build().also { db ->
                         INSTANCE = db
                         seedCategories(db)
@@ -73,3 +74,4 @@ abstract class AppDatabase : RoomDatabase() {
         }
     }
 }
+

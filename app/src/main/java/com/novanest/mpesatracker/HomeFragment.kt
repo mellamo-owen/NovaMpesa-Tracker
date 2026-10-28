@@ -1,9 +1,11 @@
 package com.novanest.mpesatracker
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.novanest.mpesatracker.data.AppDatabase
@@ -27,6 +29,9 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         db = AppDatabase.get(requireContext())
         
+        applySavedTheme()
+        setupThemeMenu()
+        
         viewLifecycleOwner.lifecycleScope.launch {
             val state = db.appStateDao().getState()
             if (state != null) {
@@ -38,12 +43,10 @@ class HomeFragment : Fragment() {
                 
                 if (isSubscribed) {
                     _binding?.tvTrialBadge?.text = "Premium Active"
-                    _binding?.tvTrialBadge?.setBackgroundColor(Color.parseColor("#00E676"))
                 } else {
                     val daysLeft = TimeUnit.MILLISECONDS.toDays(trialEnd - now).toInt()
                     if (daysLeft > 0) {
                         _binding?.tvTrialBadge?.text = "Trial: $daysLeft days left"
-                        _binding?.tvTrialBadge?.setBackgroundColor(Color.parseColor("#00E676"))
                     } else {
                         _binding?.tvTrialBadge?.text = "Trial Expired"
                         _binding?.tvTrialBadge?.setBackgroundColor(Color.parseColor("#E53935"))
@@ -51,6 +54,7 @@ class HomeFragment : Fragment() {
                 }
             }
 
+            // Recalculate totals and chart as before
             val cal = Calendar.getInstance()
             cal.firstDayOfWeek = Calendar.MONDAY
             cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
@@ -61,17 +65,16 @@ class HomeFragment : Fragment() {
 
             val allTxns = db.transactionDao().getAll().first()
             
-            val weekExp = allTxns.filter { it.timestamp >= startOfWeek && !it.isLoan }.sumOf { it.amount }
-            val monthExp = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(30)) && !it.isLoan }.sumOf { it.amount }
+            val weekExp = allTxns.filter { it.timestamp >= startOfWeek && !it.isLoan }.sumOf { it.amount + it.transactionCost }
+            val monthExp = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(30)) && !it.isLoan }.sumOf { it.amount + it.transactionCost }
             val deposits = allTxns.filter { it.isLoan }.sumOf { it.amount }
 
             _binding?.tvWeekTotal?.text = String.format("Ksh %,.2f", weekExp)
             _binding?.tvMonthTotal?.text = String.format("Ksh %,.2f", monthExp)
             _binding?.tvExternalDeposits?.text = String.format("External Deposits: Ksh %,.2f", deposits)
             
-            // Runway
             val latestBalance = allTxns.firstOrNull { it.balance != null }?.balance ?: 0.0
-            val weeklySpend = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(7)) && !it.isLoan }.sumOf { it.amount }
+            val weeklySpend = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(7)) }.sumOf { it.amount }
             val dailyBurn = if (weeklySpend > 0) weeklySpend / 7 else 1.0
             val runwayDays = if (latestBalance > 0 && dailyBurn > 0) (latestBalance / dailyBurn).toInt() else 0
             
@@ -82,7 +85,6 @@ class HomeFragment : Fragment() {
                 _binding?.tvRunway?.text = "M-Pesa Runway: Add a transaction"
             }
 
-            // Bar Chart
             val weekTxns = allTxns.filter { it.timestamp >= startOfWeek && !it.isLoan }
             val dailyTotals = DoubleArray(7)
             for (txn in weekTxns) {
@@ -97,5 +99,36 @@ class HomeFragment : Fragment() {
             _binding?.barChart?.setData(chartData, chartLabels)
         }
     }
+
+    private fun setupThemeMenu() {
+        _binding?.btnThemeColor?.setOnClickListener {
+            val options = arrayOf("Royal & Emerald", "Ocean & Gold", "Pink & Rose Gold")
+            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Select Color Theme")
+                .setItems(options) { _, which ->
+                    val prefs = requireContext().getSharedPreferences("theme_prefs", android.content.Context.MODE_PRIVATE)
+                    prefs.edit().putInt("color_theme", which).apply()
+                    applySavedTheme()
+                    Toast.makeText(requireContext(), "Theme applied!", Toast.LENGTH_SHORT).show()
+                }
+                .show()
+        }
+    }
+
+    private fun applySavedTheme() {
+        val prefs = requireContext().getSharedPreferences("theme_prefs", android.content.Context.MODE_PRIVATE)
+        val themeIndex = prefs.getInt("color_theme", 0)
+        
+        // Change the background color of the main layout dynamically
+        val rootView = _binding?.root
+        when (themeIndex) {
+            0 -> rootView?.background = ColorDrawable(Color.parseColor("#F4F7FA")) // Royal
+            1 -> rootView?.background = ColorDrawable(Color.parseColor("#E3F2FD")) // Ocean
+            2 -> rootView?.background = ColorDrawable(Color.parseColor("#FCE4EC")) // Pink
+        }
+    }
+
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
+
+

@@ -1,13 +1,13 @@
 package com.novanest.mpesatracker
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
-import com.novanest.mpesatracker.data.AppDatabase
 import com.novanest.mpesatracker.databinding.ActivityMainBinding
-import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -17,25 +17,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val db = AppDatabase.get(this)
-        lifecycleScope.launch {
-            val state = db.appStateDao().getState()
-            if (state != null) {
-                val now = System.currentTimeMillis()
-                val trialEnd = state.trialStart + TimeUnit.DAYS.toMillis(60)
-                val isSubscribed = state.subscriptionExpiry != null && state.subscriptionExpiry > now
-                
-                // ONLY LOCK IF 60 DAYS HAVE PASSED AND THEY HAVEN'T PAID
-                if (now >= trialEnd && !isSubscribed) {
-                    startActivity(Intent(this@MainActivity, SubscriptionActivity::class.java))
-                    finish()
-                    return@launch
-                }
-            }
-            
-            // If trial is active (Day 1 to 60), load the Home screen
-            loadFragment(HomeFragment())
-        }
+        loadFragment(HomeFragment())
+        askForBatteryOptimization()
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -44,6 +27,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_budgets -> { loadFragment(BudgetsFragment()); true }
                 R.id.nav_reports -> { loadFragment(ReportsFragment()); true }
                 else -> false
+            }
+        }
+    }
+
+    private fun askForBatteryOptimization() {
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            try {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            } catch (e: Exception) {
+                startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
             }
         }
     }

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F4F8"
+    android:background="#F4F7FA"
     android:paddingBottom="24dp">
 
     <LinearLayout
@@ -11,15 +11,23 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Background Image Header -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="240dp">
+            
             <ImageView
                 android:id="@+id/imgHomeBg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:src="@drawable/bg_home" />
+                
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#40000000" />
+
             <TextView
                 android:id="@+id/tvGreeting"
                 android:layout_width="wrap_content"
@@ -34,14 +42,15 @@
                 android:shadowColor="#000000"
                 android:shadowDx="2"
                 android:shadowDy="2"
-                android:shadowRadius="4"/>
+                android:shadowRadius="6"/>
+                
             <TextView
                 android:id="@+id/tvTrialBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_btn_emerald"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="8dp"
+                android:background="#00E676"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
                 android:text="Trial Active"
                 android:textColor="#000000"
                 android:textStyle="bold"
@@ -49,6 +58,20 @@
                 android:layout_marginBottom="24dp"
                 android:layout_marginStart="24dp"
                 android:elevation="4dp"/>
+
+            <!-- PALETTE ICON -->
+            <ImageView
+                android:id="@+id/btnThemeColor"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:padding="10dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:background="#66000000"
+                app:tint="#FFFFFF"
+                android:elevation="4dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="24dp" />
         </FrameLayout>
 
         <!-- Totals Card -->
@@ -57,22 +80,20 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="-16dp"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="4dp"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
+            android:foreground="?attr/selectableItemBackground">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp"
-                android:background="@drawable/bg_card_white">
+                android:background="#FFFFFF">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Spent This Week" android:textColor="#757575" android:textSize="14sp"/>
-                <TextView android:id="@+id/tvWeekTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ksh 0.00" android:textColor="#E53935" android:textSize="36sp" android:textStyle="bold" />
+                <TextView android:id="@+id/tvWeekTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ksh 0.00" android:textColor="#D32F2F" android:textSize="32sp" android:textStyle="bold" />
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginVertical="16dp" />
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Spent This Month" android:textColor="#757575" android:textSize="14sp"/>
-                <TextView android:id="@+id/tvMonthTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ksh 0.00" android:textColor="#E53935" android:textSize="36sp" android:textStyle="bold" />
+                <TextView android:id="@+id/tvMonthTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ksh 0.00" android:textColor="#D32F2F" android:textSize="32sp" android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -82,17 +103,15 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="20dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
+            android:foreground="?attr/selectableItemBackground">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
+                android:padding="16dp"
                 android:gravity="center"
-                android:background="@drawable/bg_card_blue">
+                android:background="#0A1C3A">
                 <TextView
                     android:id="@+id/tvExternalDeposits"
                     android:layout_width="wrap_content"
@@ -110,23 +129,21 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="20dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="2dp"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
+            android:foreground="?attr/selectableItemBackground">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="20dp"
+                android:padding="16dp"
                 android:gravity="center"
-                android:background="@drawable/bg_card_blue">
+                android:background="#0A1C3A">
                 <TextView
                     android:id="@+id/tvRunway"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="M-Pesa Runway: Calculating..."
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#00E676" />
             </LinearLayout>
@@ -139,15 +156,15 @@
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="4dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@drawable/bg_card_blue">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Spending" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_marginBottom="16dp"/>
+                android:padding="16dp"
+                android:background="#0A1C3A">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Spending" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_marginBottom="8dp"/>
                 <com.novanest.mpesatracker.BarChartView
                     android:id="@+id/barChart"
                     android:layout_width="match_parent"
@@ -157,4 +174,3 @@
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
-

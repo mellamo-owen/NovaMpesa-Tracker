@@ -44,11 +44,11 @@ class ReportsFragment : Fragment() {
             val categories = db.categoryDao().getAll().first()
 
             // 1. Total Spent
-            val totalSpent = allTxns.filter { it.timestamp >= startOfMonth && !it.isLoan }.sumOf { it.amount }
+            val totalSpent = allTxns.filter { it.timestamp >= startOfMonth && !it.isLoan }.sumOf { it.amount + it.transactionCost }
             _binding?.tvTotalSpent?.text = String.format("Ksh %,.2f", totalSpent)
 
             // 2. The Leakage
-            val leakage = allTxns.filter { it.timestamp >= startOfMonth && it.amount < 200 && !it.isLoan }.sumOf { it.amount }
+            val leakage = allTxns.filter { it.timestamp >= startOfMonth && it.amount < 200 && !it.isLoan }.sumOf { it.amount + it.transactionCost }
             _binding?.tvLeakage?.text = String.format("Ksh %,.2f", leakage)
 
             // 3. Top Category
@@ -124,3 +124,4 @@ class ReportsFragment : Fragment() {
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
+

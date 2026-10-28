@@ -15,7 +15,9 @@ object NotificationHelper {
     fun showTransactionNotification(context: Context, txnId: Long, amount: Double, recipient: String) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, "M-Pesa Transactions", NotificationManager.IMPORTANCE_HIGH))
+            val channel = NotificationChannel(CHANNEL_ID, "M-Pesa Transactions", NotificationManager.IMPORTANCE_HIGH)
+            channel.setSound(null, null) // Mutes the default notification sound for instant silent alerts
+            manager.createNotificationChannel(channel)
         }
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -23,9 +25,9 @@ object NotificationHelper {
             .setContentTitle("Ksh $amount sent to $recipient")
             .setContentText("Tap a category below to save.")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE) // Tells Android this is urgent
             .setAutoCancel(true)
 
-        // 3 Buttons: Food, External Deposit, More...
         builder.addAction(0, "Food", getCategoryPendingIntent(context, txnId, 1))
         builder.addAction(0, "External Deposit", getCategoryPendingIntent(context, txnId, 999))
 
