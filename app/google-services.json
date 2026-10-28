@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "426085797901",
+    "project_id": "novampesa",
+    "storage_bucket": "novampesa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:426085797901:android:072d4e11e91d3eccbb4544",
+        "android_client_info": {
+          "package_name": "com.novanest.mpesatracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1q5xpJVYL38LG8jGRVp2LF2AVTgNcrNc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

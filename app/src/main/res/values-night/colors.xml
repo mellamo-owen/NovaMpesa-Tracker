@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="royal_blue">#1A237E</color>
+    <color name="emerald">#00E676</color>
+    <color name="black">#FFFFFF</color> <!-- Invert black to white for text -->
+    
+    <color name="bg_offwhite">#121212</color> <!-- Dark Background -->
+    <color name="card_white">#1E1E1E</color> <!-- Dark Card -->
+    <color name="text_gray">#B0B0B0</color>
+    
+    <color name="primary">@color/royal_blue</color>
+    <color name="primary_dark">@color/black</color>
+    <color name="accent">@color/emerald</color>
+    <color name="background">@color/bg_offwhite</color>
+    <color name="card_bg">@color/card_white</color>
+    <color name="text_primary">@color/black</color>
+    <color name="text_secondary">@color/text_gray</color>
+    <color name="expense_red">#EF5350</color>
+</resources>

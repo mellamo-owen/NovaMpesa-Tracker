@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="royal_blue">#0A1C3A</color> <!-- Deep Premium Royal Blue -->
+    <color name="emerald">#00E676</color> <!-- Vibrant Emerald -->
+    <color name="black">#000000</color>
+    
+    <color name="bg_offwhite">#F0F4F8</color> <!-- Better than boring white -->
+    <color name="card_white">#FFFFFF</color>
+    <color name="text_gray">#555555</color>
+    
+    <!-- Backwards compatibility -->
+    <color name="primary">@color/royal_blue</color>
+    <color name="primary_dark">@color/black</color>
+    <color name="accent">@color/emerald</color>
+    <color name="background">@color/bg_offwhite</color>
+    <color name="card_bg">@color/card_white</color>
+    <color name="text_primary">@color/black</color>
+    <color name="text_secondary">@color/text_gray</color>
+    <color name="expense_red">#E53935</color>
+</resources>

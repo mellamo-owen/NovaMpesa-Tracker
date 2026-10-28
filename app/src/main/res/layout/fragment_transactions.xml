@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg_offwhite">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transactions"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:padding="24dp"
+        android:background="@color/royal_blue"
+        android:textColor="@color/emerald" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTransactions"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:padding="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@color/royal_blue"
+        android:elevation="8dp">
+
+        <Button
+            android:id="@+id/btnLoan"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Loan"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/emerald"
+            app:cornerRadius="16dp"
+            android:layout_marginEnd="4dp"/>
+
+        <Button
+            android:id="@+id/btnRemove"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Remove"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/emerald"
+            app:cornerRadius="16dp"
+            android:layout_marginHorizontal="4dp"/>
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Add"
+            android:textSize="12sp"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/emerald"
+            app:cornerRadius="16dp"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+</LinearLayout>

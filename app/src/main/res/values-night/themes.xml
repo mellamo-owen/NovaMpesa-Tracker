@@ -1,0 +1,10 @@
+<resources>
+    <style name="Theme.MPesaExpenseTracker" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/royal_blue</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorSecondary">@color/emerald</item>
+        <item name="android:windowBackground">@color/bg_offwhite</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:navigationBarColor">@color/royal_blue</item>
+    </style>
+</resources>
