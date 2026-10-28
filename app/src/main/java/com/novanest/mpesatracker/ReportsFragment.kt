@@ -1,7 +1,5 @@
 package com.novanest.mpesatracker
 import android.content.ContentValues
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -19,7 +17,10 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class ReportsFragment : Fragment() {
     private var _binding: FragmentReportsBinding? = null
@@ -37,73 +38,64 @@ class ReportsFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             val now = System.currentTimeMillis()
-            val startOfMonth = now - (30L * 24 * 60 * 60 * 1000)
+            val startOfMonth = now - TimeUnit.DAYS.toMillis(30)
             
-            val total = db.transactionDao().totalBetween(startOfMonth, now) ?: 0.0
-            val leakage = db.transactionDao().leakageTotal(startOfMonth, now) ?: 0.0
-            
-            _binding?.tvTotalSpent?.text = String.format("Ksh %,.2f", total)
+            val allTxns = db.transactionDao().getAll().first()
+            val categories = db.categoryDao().getAll().first()
+
+            // 1. Total Spent
+            val totalSpent = allTxns.filter { it.timestamp >= startOfMonth && !it.isLoan }.sumOf { it.amount }
+            _binding?.tvTotalSpent?.text = String.format("Ksh %,.2f", totalSpent)
+
+            // 2. The Leakage
+            val leakage = allTxns.filter { it.timestamp >= startOfMonth && it.amount < 200 && !it.isLoan }.sumOf { it.amount }
             _binding?.tvLeakage?.text = String.format("Ksh %,.2f", leakage)
-            
-            // Idea 17: Monthly Financial Report Card
-            val grade: String
-            val advice: String
-            
-            if (total == 0.0) {
-                grade = "N/A"
-                advice = "No spending recorded this month."
-            } else {
-                // Calculate leakage percentage
-                val leakagePercentage = (leakage / total) * 100
-                
-                if (leakagePercentage < 10) {
-                    grade = "A"
-                    advice = "Excellent! You are highly disciplined. Very little money is leaking into small snacks and fees."
-                } else if (leakagePercentage < 25) {
-                    grade = "B"
-                    advice = "Good job. You are mostly in control, but keep an eye on those small daily snacks."
-                } else if (leakagePercentage < 40) {
-                    grade = "C"
-                    advice = "Average. A lot of your money is being drained by small things (smokies, airtime, boda). Try to cut back."
-                } else if (leakagePercentage < 60) {
-                    grade = "D"
-                    advice = "Warning! You are bleeding money on small purchases. Almost half your budget is leaking."
-                } else {
-                    grade = "F"
-                    advice = "Critical! You need to stop buying small things immediately. Most of your money is disappearing on impulses."
+
+            // 3. Top Category
+            var topCatName = "None"
+            var topCatAmount = 0.0
+            for (cat in categories) {
+                val catSpent = allTxns.filter { it.categoryId == cat.id && it.timestamp >= startOfMonth && !it.isLoan }.sumOf { it.amount }
+                if (catSpent > topCatAmount) {
+                    topCatAmount = catSpent
+                    topCatName = cat.name
                 }
             }
-            
-            _binding?.tvReportGrade?.text = grade
-            _binding?.tvReportAdvice?.text = advice
-            
-            val categories = db.categoryDao().getAllOnce()
-            var topCategory = "None"
-            var maxSpent = 0.0
-            for (cat in categories) {
-                val spent = db.transactionDao().categoryTotalBetween(cat.id, startOfMonth, now) ?: 0.0
-                if (spent > maxSpent) { maxSpent = spent; topCategory = cat.name }
-            }
-
-            _binding?.tvTopCategory?.text = topCategory
-            _binding?.tvTopCategoryAmount?.text = String.format("Ksh %,.2f", maxSpent)
+            _binding?.tvTopCategory?.text = topCatName
+            _binding?.tvTopCategoryAmount?.text = String.format("Ksh %,.2f", topCatAmount)
         }
 
-        _binding?.btnExportCsv?.setOnClickListener { exportToCsv() }
+        // DOWNLOAD BUTTON LOGIC
+        _binding?.btnDownloadMonthly?.setOnClickListener {
+            val cal = Calendar.getInstance()
+            val dayOfMonth = cal.get(Calendar.DAY_OF_MONTH)
+            
+            // If it's not the end of the month (e.g., not the 28th, 29th, 30th, or 31st)
+            if (dayOfMonth < 28) {
+                Toast.makeText(requireContext(), "Report will be active at the end of the month.", Toast.LENGTH_LONG).show()
+            } else {
+                // Download the report!
+                downloadMonthlyReport()
+            }
+        }
     }
 
-    private fun exportToCsv() {
+    private fun downloadMonthlyReport() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val list = db.transactionDao().getAll().first()
-            
-            if (list.isEmpty()) { Toast.makeText(requireContext(), "No data to export", Toast.LENGTH_SHORT).show(); return@launch }
-            
-            val csv = StringBuilder("Date,Recipient,Amount,Code\n")
+            val allTxns = db.transactionDao().getAll().first()
+            if (allTxns.isEmpty()) {
+                Toast.makeText(requireContext(), "No data to export", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+
+            val csv = StringBuilder("Date,Recipient,Amount,IsDeposit\n")
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-            for (txn in list) csv.append("${sdf.format(Date(txn.timestamp))},\"${txn.recipient}\",${txn.amount},${txn.txnCode ?: "Manual"}\n")
-            
+            for (txn in allTxns) {
+                csv.append("${sdf.format(Date(txn.timestamp))},\"${txn.recipient}\",${txn.amount},${txn.isLoan}\n")
+            }
+
             try {
-                val filename = "NovaMpesa_Analytics_${System.currentTimeMillis()}.csv"
+                val filename = "NovaMpesa_Monthly_Report_${System.currentTimeMillis()}.csv"
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     val resolver = requireContext().contentResolver
                     val contentValues = ContentValues().apply {
@@ -129,5 +121,6 @@ class ReportsFragment : Fragment() {
             }
         }
     }
+
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }

@@ -6,10 +6,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.novanest.mpesatracker.data.AppDatabase
+import com.novanest.mpesatracker.data.Category
 import com.novanest.mpesatracker.databinding.FragmentBudgetsBinding
 import com.novanest.mpesatracker.databinding.ItemBudgetBinding
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -29,52 +31,55 @@ class BudgetsFragment : Fragment() {
         binding.rvBudgets.layoutManager = LinearLayoutManager(requireContext())
 
         viewLifecycleOwner.lifecycleScope.launch {
-            combine(db.categoryDao().getAll(), db.budgetDao().getAll()) { categories, budgets ->
-                val budgetList = mutableListOf<Pair<String, Pair<Double, Double>>>()
-                val cal = Calendar.getInstance()
-                cal.firstDayOfWeek = Calendar.MONDAY
-                cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-                cal.set(Calendar.HOUR_OF_DAY, 0)
-                cal.set(Calendar.MINUTE, 0)
-                val startOfWeek = cal.timeInMillis
-                val now = System.currentTimeMillis()
+            val categories = db.categoryDao().getAll().first()
+            val allTxns = db.transactionDao().getAll().first()
+            
+            // Exclude External Deposit from the spending breakdown
+            val spendingCategories = categories.filter { it.name != "External Deposit" }
 
-                for (category in categories) {
-                    val budget = budgets.find { it.categoryId == category.id }
-                    val spent = db.transactionDao().categoryTotalBetween(category.id, startOfWeek, now) ?: 0.0
-                    val budgetAmount = budget?.weeklyAmount ?: 0.0
-                    budgetList.add(category.name to Pair(spent, budgetAmount))
-                }
-                budgetList
-            }.collect { list ->
-                _binding?.rvBudgets?.adapter = BudgetAdapter(list)
+            val cal = Calendar.getInstance()
+            cal.firstDayOfWeek = Calendar.MONDAY
+            cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            val startOfWeek = cal.timeInMillis
+            val now = System.currentTimeMillis()
+
+            val categoryTotals = spendingCategories.map { category ->
+                val totalSpent = allTxns.filter { 
+                    it.categoryId == category.id && 
+                    it.timestamp >= startOfWeek && 
+                    !it.isLoan 
+                }.sumOf { it.amount }
+                
+                category to totalSpent
             }
+
+            _binding?.rvBudgets?.adapter = CategorySpendingAdapter(categoryTotals)
         }
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+    override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
 
-class BudgetAdapter(private val list: List<Pair<String, Pair<Double, Double>>>) : 
-    androidx.recyclerview.widget.RecyclerView.Adapter<BudgetAdapter.ViewHolder>() {
-    class ViewHolder(val binding: ItemBudgetBinding) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root)
+class CategorySpendingAdapter(private val list: List<Pair<Category, Double>>) : 
+    RecyclerView.Adapter<CategorySpendingAdapter.ViewHolder>() {
+    
+    class ViewHolder(val binding: ItemBudgetBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(ItemBudgetBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = list[position]
-        holder.binding.tvCategoryName.text = item.first
-        val spent = item.second.first
-        val budget = item.second.second
-        holder.binding.tvBudgetProgress.text = String.format("Ksh %,.2f / Ksh %,.2f", spent, budget)
-        if (budget > 0) {
-            holder.binding.progressBar.progress = ((spent / budget) * 100).toInt().coerceAtMost(100)
-        }
+        val (category, totalSpent) = list[position]
+        holder.binding.tvCategoryName.text = category.name
+        holder.binding.tvBudgetStatus.text = String.format("Ksh %,.2f", totalSpent)
+        
+        // Calculate relative progress bar against the highest spending category
+        val maxSpent = list.maxOfOrNull { it.second } ?: 1.0
+        val progress = if (maxSpent > 0) ((totalSpent / maxSpent) * 100).toInt() else 0
+        holder.binding.progressBar.progress = progress.coerceIn(0, 100)
     }
+
     override fun getItemCount() = list.size
 }

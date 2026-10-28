@@ -1,5 +1,4 @@
 package com.novanest.mpesatracker.notifications
-
 import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -17,7 +16,11 @@ class CategoryActionReceiver : BroadcastReceiver() {
         if (txnId != -1L && categoryId != -1L) {
             val db = AppDatabase.get(context)
             CoroutineScope(Dispatchers.IO).launch {
-                db.transactionDao().updateCategory(txnId, categoryId)
+                if (categoryId == 999L) {
+                    db.transactionDao().updateLoanStatus(txnId, true)
+                } else {
+                    db.transactionDao().updateCategory(txnId, categoryId)
+                }
             }
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             manager.cancel(1001)

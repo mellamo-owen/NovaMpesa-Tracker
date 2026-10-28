@@ -15,8 +15,7 @@ object NotificationHelper {
     fun showTransactionNotification(context: Context, txnId: Long, amount: Double, recipient: String) {
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(CHANNEL_ID, "M-Pesa Transactions", NotificationManager.IMPORTANCE_HIGH)
-            manager.createNotificationChannel(channel)
+            manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, "M-Pesa Transactions", NotificationManager.IMPORTANCE_HIGH))
         }
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
@@ -26,11 +25,10 @@ object NotificationHelper {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
-        // Top 2 categories
+        // 3 Buttons: Food, External Deposit, More...
         builder.addAction(0, "Food", getCategoryPendingIntent(context, txnId, 1))
-        builder.addAction(0, "Transport", getCategoryPendingIntent(context, txnId, 2))
-        
-        // More button
+        builder.addAction(0, "External Deposit", getCategoryPendingIntent(context, txnId, 999))
+
         val moreIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("SHOW_MORE_CATEGORIES", true)
@@ -44,7 +42,7 @@ object NotificationHelper {
 
     private fun getCategoryPendingIntent(context: Context, txnId: Long, categoryId: Long): PendingIntent {
         val intent = Intent(context, CategoryActionReceiver::class.java).apply {
-            action = "com.novanest.mpesatracker.ASSIGN_CATEGORY"
+            action = "ASSIGN_CATEGORY"
             putExtra("TXN_ID", txnId)
             putExtra("CATEGORY_ID", categoryId)
         }

@@ -26,7 +26,6 @@ class BarChartView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         
-        // If no data or all zeros, show text
         if (data.isEmpty() || data.all { it == 0f }) {
             paint.color = Color.WHITE
             paint.textSize = 40f
@@ -45,14 +44,13 @@ class BarChartView @JvmOverloads constructor(
         paint.textAlign = Paint.Align.CENTER
 
         for (i in data.indices) {
-            // Even if the bar is 0, we draw a tiny line so the day is visible
             val barHeight = if (data[i] == 0f) 4f else (data[i] / maxVal) * maxBarHeight
             val left = (i * (barWidth + gap)) + (gap / 2)
             val top = height - bottomPadding - barHeight
             val right = left + barWidth
             val bottom = height - bottomPadding
 
-            paint.color = Color.parseColor("#00E676") // Emerald Green
+            paint.color = Color.parseColor("#00E676") // Emerald
             rectF.set(left, top, right, bottom)
             canvas.drawRoundRect(rectF, 16f, 16f, paint)
 

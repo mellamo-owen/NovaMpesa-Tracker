@@ -1,5 +1,4 @@
 plugins {
-    id("com.google.gms.google-services")
     alias(libs.plugins.android.application)
     id("com.google.devtools.ksp") version "2.3.6"
 }
@@ -21,9 +20,9 @@ android {
     signingConfigs {
         create("release") {
             storeFile = file("../mpesa_release.jks")
-            storePassword = "Mickowen2026!" // Change if you used a different password
+            storePassword = "Mickowen2026!"
             keyAlias = "mpesa_key"
-            keyPassword = "Mickowen2026!" // Change if you used a different password
+            keyPassword = "Mickowen2026!"
         }
     }
 
@@ -54,8 +53,6 @@ android {
 }
 
 dependencies {
-    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
-    implementation("com.google.firebase:firebase-auth")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
@@ -80,4 +77,3 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
-

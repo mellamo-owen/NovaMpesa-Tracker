@@ -3,25 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_offwhite">
+    android:background="#F0F4F8"
+    android:paddingBottom="24dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- HEADER WITH BACKGROUND AND TOGGLE -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="260dp">
-            
+            android:layout_height="240dp">
             <ImageView
                 android:id="@+id/imgHomeBg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:src="@drawable/bg_home" />
-
             <TextView
                 android:id="@+id/tvGreeting"
                 android:layout_width="wrap_content"
@@ -32,39 +30,25 @@
                 android:fontFamily="sans-serif-black"
                 android:textStyle="bold"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="80dp" 
+                android:layout_marginTop="80dp"
                 android:shadowColor="#000000"
                 android:shadowDx="2"
                 android:shadowDy="2"
                 android:shadowRadius="4"/>
-
             <TextView
                 android:id="@+id/tvTrialBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/emerald"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="6dp"
+                android:background="@drawable/bg_btn_emerald"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
                 android:text="Trial Active"
-                android:textColor="@color/black"
+                android:textColor="#000000"
                 android:textStyle="bold"
                 android:layout_gravity="bottom"
                 android:layout_marginBottom="24dp"
-                android:layout_marginStart="24dp"/>
-
-            <!-- DARK MODE TOGGLE -->
-            <ImageView
-                android:id="@+id/btnThemeToggle"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:padding="10dp"
-                android:src="@android:drawable/ic_menu_day"
-                app:tint="#FFFFFF"
-                android:background="@drawable/bg_theme_toggle"
-                android:elevation="8dp"
-                android:layout_gravity="top|end"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="24dp" />
+                android:layout_marginStart="24dp"
+                android:elevation="4dp"/>
         </FrameLayout>
 
         <!-- Totals Card -->
@@ -72,71 +56,51 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="-24dp"
+            android:layout_marginTop="-16dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="12dp">
+            app:cardElevation="4dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="24dp"
-                android:background="@color/card_white">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Spent This Week"
-                    android:textColor="@color/text_gray" />
-                <TextView
-                    android:id="@+id/tvWeekTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ksh 0.00"
-                    android:textColor="@color/expense_red"
-                    android:textSize="32sp"
-                    android:textStyle="bold" />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#EEEEEE"
-                    android:layout_marginVertical="16dp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Spent This Month"
-                    android:textColor="@color/text_gray" />
-                <TextView
-                    android:id="@+id/tvMonthTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ksh 0.00"
-                    android:textColor="@color/expense_red"
-                    android:textSize="32sp"
-                    android:textStyle="bold" />
+                android:background="@drawable/bg_card_white">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Spent This Week" android:textColor="#757575" android:textSize="14sp"/>
+                <TextView android:id="@+id/tvWeekTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ksh 0.00" android:textColor="#E53935" android:textSize="36sp" android:textStyle="bold" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#EEEEEE" android:layout_marginVertical="16dp" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Spent This Month" android:textColor="#757575" android:textSize="14sp"/>
+                <TextView android:id="@+id/tvMonthTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ksh 0.00" android:textColor="#E53935" android:textSize="36sp" android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Loans Card -->
+        <!-- External Deposits Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:gravity="center"
-                android:background="@color/card_white">
+                android:background="@drawable/bg_card_blue">
                 <TextView
-                    android:id="@+id/tvLoansOwed"
+                    android:id="@+id/tvExternalDeposits"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Owed to you: Ksh 0.00"
+                    android:text="External Deposits: Ksh 0.00"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="@color/royal_blue" />
+                    android:textColor="#00E676" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -146,14 +110,17 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp">
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:gravity="center"
-                android:background="@color/royal_blue">
+                android:background="@drawable/bg_card_blue">
                 <TextView
                     android:id="@+id/tvRunway"
                     android:layout_width="wrap_content"
@@ -161,106 +128,30 @@
                     android:text="M-Pesa Runway: Calculating..."
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="@color/emerald" />
+                    android:textColor="#00E676" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- BAR CHART CARD -->
+        <!-- Bar Chart Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="24dp"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="8dp">
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="280dp">
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/bg_home"
-                    android:alpha="0.3" />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="#99000000" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Spending Breakdown"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"
-                        android:layout_marginBottom="8dp" />
-                    <com.novanest.mpesatracker.BarChartView
-                        android:id="@+id/barChart"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                </LinearLayout>
-            </FrameLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Download Button -->
-        <Button
-            android:id="@+id/btnDownloadReport"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:text="Download Report (CSV)"
-            android:textColor="@color/black"
-            android:backgroundTint="@color/emerald"
-            app:cornerRadius="16dp" />
-
-        <!-- Advisory Button -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardAdvisory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="32dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="6dp"
-            app:cardBackgroundColor="@color/royal_blue">
+            app:cardElevation="4dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp"
-                android:gravity="center_vertical">
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@android:drawable/ic_menu_myplaces"
-                    app:tint="@color/emerald" />
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Novafinance Advisory"
-                        android:textColor="@color/emerald"
-                        android:textStyle="bold"
-                        android:textSize="16sp" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Tap to view investment plans"
-                        android:textColor="#CCCCCC"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:background="@drawable/bg_card_blue">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Daily Spending" android:textColor="#FFFFFF" android:textStyle="bold" android:layout_marginBottom="16dp"/>
+                <com.novanest.mpesatracker.BarChartView
+                    android:id="@+id/barChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

@@ -4,13 +4,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Cash Expense"
+        android:text="Add Manual Expense"
         android:textSize="20sp"
         android:textStyle="bold"
         android:layout_marginBottom="16dp"/>
+
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,6 +23,7 @@
             android:layout_height="wrap_content"
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,4 +35,17 @@
             android:layout_height="wrap_content"
             android:inputType="textCapWords" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Category:"
+        android:layout_marginTop="16dp"
+        android:textStyle="bold"/>
+        
+    <Spinner
+        android:id="@+id/spinnerCategory"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"/>
 </LinearLayout>

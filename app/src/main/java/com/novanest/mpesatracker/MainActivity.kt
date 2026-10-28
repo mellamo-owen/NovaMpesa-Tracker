@@ -2,28 +2,40 @@ package com.novanest.mpesatracker
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.novanest.mpesatracker.data.AppDatabase
 import com.novanest.mpesatracker.databinding.ActivityMainBinding
+import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme BEFORE super.onCreate
-        val prefs = getSharedPreferences("theme_prefs", MODE_PRIVATE)
-        val isDarkMode = prefs.getBoolean("is_dark_mode", false)
-        if (isDarkMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
-
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        loadFragment(HomeFragment())
+        val db = AppDatabase.get(this)
+        lifecycleScope.launch {
+            val state = db.appStateDao().getState()
+            if (state != null) {
+                val now = System.currentTimeMillis()
+                val trialEnd = state.trialStart + TimeUnit.DAYS.toMillis(60)
+                val isSubscribed = state.subscriptionExpiry != null && state.subscriptionExpiry > now
+                
+                // ONLY LOCK IF 60 DAYS HAVE PASSED AND THEY HAVEN'T PAID
+                if (now >= trialEnd && !isSubscribed) {
+                    startActivity(Intent(this@MainActivity, SubscriptionActivity::class.java))
+                    finish()
+                    return@launch
+                }
+            }
+            
+            // If trial is active (Day 1 to 60), load the Home screen
+            loadFragment(HomeFragment())
+        }
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -34,18 +46,10 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        
-        if (intent.getBooleanExtra("SHOW_MORE_CATEGORIES", false)) {
-            val txnId = intent.getLongExtra("TXN_ID", -1L)
-            val intentToMore = Intent(this, MoreCategoriesActivity::class.java)
-            intentToMore.putExtra("TXN_ID", txnId)
-            startActivity(intentToMore)
-        }
     }
 
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .setCustomAnimations(R.anim.fade_in, android.R.anim.fade_out)
             .replace(R.id.fragmentContainer, fragment)
             .commit()
     }
