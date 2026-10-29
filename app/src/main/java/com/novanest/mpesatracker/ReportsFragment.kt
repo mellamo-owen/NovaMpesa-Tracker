@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
@@ -43,19 +42,19 @@ class ReportsFragment : Fragment() {
             val allTxns = db.transactionDao().getAll().first()
             val categories = db.categoryDao().getAll().first()
 
-            // 1. Total Spent
-            val totalSpent = allTxns.filter { it.timestamp >= startOfMonth && !it.isLoan }.sumOf { it.amount + it.transactionCost }
+            // Total Spent (Excluding External Deposits)
+            val totalSpent = allTxns.filter { it.timestamp >= startOfMonth && !it.isExternalDeposit }.sumOf { it.amount + it.transactionCost }
             _binding?.tvTotalSpent?.text = String.format("Ksh %,.2f", totalSpent)
 
-            // 2. The Leakage
-            val leakage = allTxns.filter { it.timestamp >= startOfMonth && it.amount < 200 && !it.isLoan }.sumOf { it.amount + it.transactionCost }
+            // The Leakage
+            val leakage = allTxns.filter { it.timestamp >= startOfMonth && it.amount < 200 && !it.isExternalDeposit }.sumOf { it.amount + it.transactionCost }
             _binding?.tvLeakage?.text = String.format("Ksh %,.2f", leakage)
 
-            // 3. Top Category
+            // Top Category
             var topCatName = "None"
             var topCatAmount = 0.0
             for (cat in categories) {
-                val catSpent = allTxns.filter { it.categoryId == cat.id && it.timestamp >= startOfMonth && !it.isLoan }.sumOf { it.amount }
+                val catSpent = allTxns.filter { it.categoryId == cat.id && it.timestamp >= startOfMonth && !it.isExternalDeposit }.sumOf { it.amount + it.transactionCost }
                 if (catSpent > topCatAmount) {
                     topCatAmount = catSpent
                     topCatName = cat.name
@@ -65,16 +64,13 @@ class ReportsFragment : Fragment() {
             _binding?.tvTopCategoryAmount?.text = String.format("Ksh %,.2f", topCatAmount)
         }
 
-        // DOWNLOAD BUTTON LOGIC
         _binding?.btnDownloadMonthly?.setOnClickListener {
-            val cal = Calendar.getInstance()
-            val dayOfMonth = cal.get(Calendar.DAY_OF_MONTH)
+            val cal = java.util.Calendar.getInstance()
+            val dayOfMonth = cal.get(java.util.Calendar.DAY_OF_MONTH)
             
-            // If it's not the end of the month (e.g., not the 28th, 29th, 30th, or 31st)
             if (dayOfMonth < 28) {
                 Toast.makeText(requireContext(), "Report will be active at the end of the month.", Toast.LENGTH_LONG).show()
             } else {
-                // Download the report!
                 downloadMonthlyReport()
             }
         }
@@ -88,10 +84,10 @@ class ReportsFragment : Fragment() {
                 return@launch
             }
 
-            val csv = StringBuilder("Date,Recipient,Amount,IsDeposit\n")
+            val csv = StringBuilder("Date,Recipient,Amount,IsDeposit,TransactionCost\n")
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
             for (txn in allTxns) {
-                csv.append("${sdf.format(Date(txn.timestamp))},\"${txn.recipient}\",${txn.amount},${txn.isLoan}\n")
+                csv.append("${sdf.format(Date(txn.timestamp))},\"${txn.recipient}\",${txn.amount},${txn.isExternalDeposit},${txn.transactionCost}\n")
             }
 
             try {
@@ -124,4 +120,3 @@ class ReportsFragment : Fragment() {
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
-

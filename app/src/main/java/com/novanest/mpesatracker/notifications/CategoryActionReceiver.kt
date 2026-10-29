@@ -12,18 +12,21 @@ class CategoryActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val txnId = intent.getLongExtra("TXN_ID", -1L)
         val categoryId = intent.getLongExtra("CATEGORY_ID", -1L)
+        val notificationId = intent.getIntExtra("NOTIFICATION_ID", -1)
 
         if (txnId != -1L && categoryId != -1L) {
             val db = AppDatabase.get(context)
             CoroutineScope(Dispatchers.IO).launch {
                 if (categoryId == 999L) {
-                    db.transactionDao().updateLoanStatus(txnId, true)
+                    db.transactionDao().updateDepositStatus(txnId, true)
                 } else {
                     db.transactionDao().updateCategory(txnId, categoryId)
                 }
             }
-            val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            manager.cancel(1001)
+            if (notificationId != -1) {
+                val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.cancel(notificationId)
+            }
         }
     }
 }

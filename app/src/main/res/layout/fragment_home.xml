@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F7FA"
+    android:background="@android:color/transparent"
     android:paddingBottom="24dp">
 
     <LinearLayout
@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Background Image Header -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="240dp">
@@ -59,7 +58,6 @@
                 android:layout_marginStart="24dp"
                 android:elevation="4dp"/>
 
-            <!-- PALETTE ICON -->
             <ImageView
                 android:id="@+id/btnThemeColor"
                 android:layout_width="44dp"
@@ -117,6 +115,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="External Deposits: Ksh 0.00"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#00E676" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Loans Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:foreground="?attr/selectableItemBackground">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:gravity="center"
+                android:background="#0A1C3A">
+                <TextView
+                    android:id="@+id/tvLoansOwed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Owed to You: Ksh 0.00"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#00E676" />

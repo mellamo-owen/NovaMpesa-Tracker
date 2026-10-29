@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F7FA"
+    android:background="@android:color/transparent"
     android:paddingBottom="24dp">
 
     <LinearLayout
@@ -132,9 +132,15 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="Download Monthly Report"
-            android:textColor="#000000"
+            android:textColor="#1A1A1A"
             android:backgroundTint="#00E676"
             app:cornerRadius="16dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
+
+
+
+
+
+

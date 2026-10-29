@@ -1,7 +1,6 @@
 package com.novanest.mpesatracker
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -16,6 +15,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (intent.getBooleanExtra("SHOW_MORE_CATEGORIES", false)) {
+            val txnId = intent.getLongExtra("TXN_ID", -1L)
+            val intentToMore = Intent(this, MoreCategoriesActivity::class.java)
+            intentToMore.putExtra("TXN_ID", txnId)
+            startActivity(intentToMore)
+            finish()
+            return
+        }
 
         loadFragment(HomeFragment())
         askForBatteryOptimization()
@@ -48,5 +56,9 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .commit()
+        // Apply theme on page change
+        binding.root.post {
+            ThemeManager.applyTheme(this, binding.root)
+        }
     }
 }

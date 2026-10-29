@@ -3,6 +3,7 @@ data class ParsedSms(val amount: Double, val recipient: String, val timestamp: L
 
 object MpesaParser {
     private val amountRegex = Regex("Ksh\\s*([0-9,]+\\.?[0-9]*)", RegexOption.IGNORE_CASE)
+    // Matches "Transaction cost, Ksh7.00" or "Transaction cost, Ksh 7.00"
     private val costRegex = Regex("Transaction cost,?\\s*Ksh\\s*([0-9,]+\\.?[0-9]*)", RegexOption.IGNORE_CASE)
 
     fun parse(smsText: String): ParsedSms? {
@@ -13,19 +14,23 @@ object MpesaParser {
         val isSent = smsText.contains("sent to", ignoreCase = true) || smsText.contains("paid to", ignoreCase = true)
         if (!isSent) return null
 
+        // Extract Amount
         val amountMatch = amountRegex.find(smsText)
         val amountString = amountMatch?.groupValues?.get(1)?.replace(",", "") ?: return null
         val amount = amountString.toDoubleOrNull() ?: return null
 
-        // Extract Transaction Cost (Defaults to 0.0 if not found)
+        // Extract Transaction Cost
         val costMatch = costRegex.find(smsText)
         val costString = costMatch?.groupValues?.get(1)?.replace(",", "") ?: "0.0"
         val cost = costString.toDoubleOrNull() ?: 0.0
 
+        // Extract Recipient (Cleans up double spaces)
         val recipientRegex = Regex("(?:paid to|sent to)\\s+(.+?)\\s+on\\s", RegexOption.IGNORE_CASE)
         val recipientMatch = recipientRegex.find(smsText)
-        val rawRecipient = recipientMatch?.groupValues?.get(1)?.replace("\\s+".toRegex(), " ") ?: "Unknown"
+        var rawRecipient = recipientMatch?.groupValues?.get(1) ?: "Unknown"
+        // Remove double spaces
+        rawRecipient = rawRecipient.replace(Regex("\\s+"), " ").trim()
 
-        return ParsedSms(amount, rawRecipient.trim(), System.currentTimeMillis(), cost)
+        return ParsedSms(amount, rawRecipient, System.currentTimeMillis(), cost)
     }
 }

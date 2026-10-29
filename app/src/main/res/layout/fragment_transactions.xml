@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F4F7FA">
+    android:background="@android:color/transparent">
 
     <TextView
         android:layout_width="match_parent"
@@ -15,7 +15,7 @@
         android:paddingHorizontal="24dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
-        android:textColor="#1A1A1A" />
+        android:textColor="#FFFFFF" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -27,21 +27,32 @@
         app:cardElevation="2dp"
         app:cardBackgroundColor="#FFFFFF">
         
-        <TextView
-            android:id="@+id/tvList"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTransactions"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="16dp"
-            android:textSize="16sp"
-            android:textColor="#1A1A1A" />
+            android:clipToPadding="false"
+            android:padding="16dp" />
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
+        android:paddingHorizontal="16dp"
         android:paddingBottom="24dp">
+
+        <Button
+            android:id="@+id/btnLoan"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Loan"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:backgroundTint="#0A1C3A"
+            app:cornerRadius="16dp"
+            android:layout_marginEnd="4dp"/>
 
         <Button
             android:id="@+id/btnRemove"
@@ -49,20 +60,34 @@
             android:layout_height="56dp"
             android:layout_weight="1"
             android:text="Remove"
+            android:textSize="12sp"
+            android:textColor="#000000"
+            android:backgroundTint="#E0E0E0"
+            app:cornerRadius="16dp"
+            android:layout_marginHorizontal="4dp"/>
+
+        <Button
+            android:id="@+id/btnExtDeposit"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Ext. Deposit"
+            android:textSize="12sp"
             android:textColor="#000000"
             android:backgroundTint="#00E676"
             app:cornerRadius="16dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginHorizontal="4dp"/>
 
         <Button
             android:id="@+id/btnAdd"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
-            android:text="Add Expense"
+            android:text="Add"
+            android:textSize="12sp"
             android:textColor="#000000"
             android:backgroundTint="#00E676"
             app:cornerRadius="16dp"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="4dp"/>
     </LinearLayout>
 </LinearLayout>

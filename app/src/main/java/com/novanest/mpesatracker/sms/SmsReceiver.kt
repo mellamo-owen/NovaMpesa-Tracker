@@ -13,34 +13,24 @@ import kotlinx.coroutines.launch
 class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
-        
         val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
         for (msg in messages) {
-            val sender = msg.originatingAddress ?: ""
-            val body = msg.messageBody ?: ""
-
-            // Only process M-Pesa
-            if (!sender.contains("MPESA", ignoreCase = true)) continue
-            
+            val body = msg.messageBody ?: continue
             val parsed = MpesaParser.parse(body) ?: continue
 
-            // We show the notification IMMEDIATELY before saving to the database
-            // This makes the notification pop up instantly when the SMS arrives
-            NotificationHelper.showTransactionNotification(context, 0L, parsed.amount, parsed.recipient)
-
-            // Then we save to the database in the background
             val db = AppDatabase.get(context)
             CoroutineScope(Dispatchers.IO).launch {
-                db.transactionDao().insert(
+                val txnId = db.transactionDao().insert(
                     Transaction(
                         amount = parsed.amount,
                         recipient = parsed.recipient,
                         categoryId = null,
                         timestamp = parsed.timestamp,
-                        isLoan = false,
+                        isExternalDeposit = false,
                         transactionCost = parsed.transactionCost
                     )
                 )
+                NotificationHelper.showTransactionNotification(context, txnId, parsed.amount, parsed.recipient)
             }
         }
     }

@@ -24,9 +24,10 @@ data class Transaction(
     val recipient: String, 
     val categoryId: Long?,
     val timestamp: Long, 
-    val isLoan: Boolean = false,
+    val isExternalDeposit: Boolean = false,
+    val isLoan: Boolean = false, 
     val balance: Double? = null,
-    val transactionCost: Double = 0.0 // NEW: Tracks the Safaricom fee
+    val transactionCost: Double = 0.0
 )
 
 @Dao interface AppStateDao {
@@ -42,11 +43,12 @@ data class Transaction(
     @Query("SELECT * FROM transactions ORDER BY timestamp DESC") fun getAll(): Flow<List<Transaction>>
     @Insert suspend fun insert(txn: Transaction): Long
     @Query("UPDATE transactions SET categoryId = :catId WHERE id = :txnId") suspend fun updateCategory(txnId: Long, catId: Long)
+    @Query("UPDATE transactions SET isExternalDeposit = :isDeposit WHERE id = :txnId") suspend fun updateDepositStatus(txnId: Long, isDeposit: Boolean)
     @Query("UPDATE transactions SET isLoan = :isLoan WHERE id = :txnId") suspend fun updateLoanStatus(txnId: Long, isLoan: Boolean)
     @Query("DELETE FROM transactions WHERE id = :id") suspend fun deleteById(id: Long)
 }
 
-@Database(entities = [AppState::class, Category::class, Transaction::class], version = 8, exportSchema = false)
+@Database(entities = [AppState::class, Category::class, Transaction::class], version = 11, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appStateDao(): AppStateDao
     abstract fun categoryDao(): CategoryDao
@@ -56,7 +58,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile private var INSTANCE: AppDatabase? = null
         fun get(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "clean_nova_v8.db")
+                INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "clean_nova_v11.db")
                     .fallbackToDestructiveMigration().build().also { db ->
                         INSTANCE = db
                         seedCategories(db)
@@ -67,11 +69,10 @@ abstract class AppDatabase : RoomDatabase() {
         private fun seedCategories(db: AppDatabase) {
             CoroutineScope(Dispatchers.IO).launch {
                 if (db.categoryDao().count() == 0) {
-                    val defaults = listOf("Food", "Transport", "Giving", "Clothes", "Shoes and Jewellery", "Cosmetics", "Hair Dressing and Nails", "Other", "External Deposit")
+                    val defaults = listOf("Food", "Transport", "Giving", "Clothes", "Shoes and Jewellery", "Cosmetics", "Hair Dressing and Nails", "Other")
                     defaults.forEach { name -> db.categoryDao().insert(Category(name = name)) }
                 }
             }
         }
     }
 }
-

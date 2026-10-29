@@ -49,7 +49,7 @@ class BudgetsFragment : Fragment() {
                 val totalSpent = allTxns.filter { 
                     it.categoryId == category.id && 
                     it.timestamp >= startOfWeek && 
-                    !it.isLoan 
+                    !it.isExternalDeposit 
                 }.sumOf { it.amount }
                 
                 category to totalSpent
@@ -83,3 +83,4 @@ class CategorySpendingAdapter(private val list: List<Pair<Category, Double>>) :
 
     override fun getItemCount() = list.size
 }
+
