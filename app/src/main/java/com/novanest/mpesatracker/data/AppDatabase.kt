@@ -26,6 +26,7 @@ data class Transaction(
     val timestamp: Long, 
     val isExternalDeposit: Boolean = false,
     val isLoan: Boolean = false, 
+    val isMoneyIn: Boolean = false, 
     val balance: Double? = null,
     val transactionCost: Double = 0.0
 )
@@ -48,7 +49,7 @@ data class Transaction(
     @Query("DELETE FROM transactions WHERE id = :id") suspend fun deleteById(id: Long)
 }
 
-@Database(entities = [AppState::class, Category::class, Transaction::class], version = 11, exportSchema = false)
+@Database(entities = [AppState::class, Category::class, Transaction::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun appStateDao(): AppStateDao
     abstract fun categoryDao(): CategoryDao
@@ -58,7 +59,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile private var INSTANCE: AppDatabase? = null
         fun get(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "clean_nova_v11.db")
+                INSTANCE ?: Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, "nova_stable_v1.db")
                     .fallbackToDestructiveMigration().build().also { db ->
                         INSTANCE = db
                         seedCategories(db)

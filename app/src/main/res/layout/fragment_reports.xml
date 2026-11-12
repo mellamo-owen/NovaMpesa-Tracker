@@ -4,33 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    android:paddingBottom="24dp">
+    android:paddingBottom="100dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="16dp">
+        android:paddingHorizontal="24dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Analytics"
-            android:textSize="24sp"
+            android:text="Financial Reports"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="#1A1A1A"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="24dp"
             android:layout_marginBottom="24dp" />
 
-        <!-- Leakage Card -->
+        <!-- Chart Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#1E1E1E"
+            android:layout_marginBottom="16dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -39,65 +38,77 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="The Leakage (Under Ksh 200)"
-                    android:textColor="#D32F2F"
-                    android:textStyle="bold" />
-                <TextView
-                    android:id="@+id/tvLeakage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ksh 0.00"
-                    android:textSize="28sp"
-                    android:textStyle="bold"
-                    android:textColor="#1A1A1A" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Small snacks and fares add up!"
-                    android:textSize="12sp"
-                    android:textColor="#757575" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Total Spent Card -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total Spent (Last 30 Days)"
-                    android:textColor="#757575" />
+                    android:text="Monthly Analytics"
+                    android:textColor="#A0AABF"
+                    android:textSize="14sp" />
                 <TextView
                     android:id="@+id/tvTotalSpent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ksh 0.00"
+                    android:textColor="#FFFFFF"
                     android:textSize="32sp"
                     android:textStyle="bold"
-                    android:textColor="#D32F2F" />
+                    android:layout_marginBottom="16dp" />
+                <com.novanest.mpesatracker.BarChartView
+                    android:id="@+id/reportChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Top Category Card -->
+                <!-- Total Transaction Costs Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:cardBackgroundColor="#FFFFFF"
-            android:foreground="?attr/selectableItemBackground">
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#1E1E1E"
+            android:layout_marginBottom="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="20dp">
+                
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@android:drawable/ic_menu_info_details"
+                    app:tint="#F97316" /> <!-- Orange icon -->
+                    
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Transaction Costs"
+                        android:textColor="#A0AABF"
+                        android:textSize="14sp" />
+                    <TextView
+                        android:id="@+id/tvTotalCosts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ksh 0.00"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+        
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="#1E1E1E"
+            android:layout_marginBottom="24dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -106,41 +117,44 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Top Spending Category"
-                    android:textColor="#757575" />
-                <TextView
-                    android:id="@+id/tvTopCategory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="None"
-                    android:textSize="24sp"
+                    android:text="Transaction Summary"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
                     android:textStyle="bold"
-                    android:textColor="#1A1A1A" />
-                <TextView
-                    android:id="@+id/tvTopCategoryAmount"
-                    android:layout_width="wrap_content"
+                    android:layout_marginBottom="16dp" />
+                
+                <!-- Header Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ksh 0.00"
-                    android:textSize="16sp"
-                    android:textColor="#1A1A1A" />
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Date" android:textColor="#A0AABF" android:textSize="12sp"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1.5" android:text="Name" android:textColor="#A0AABF" android:textSize="12sp"/>
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Amount" android:textColor="#A0AABF" android:textSize="12sp" android:gravity="end"/>
+                </LinearLayout>
+
+                <!-- Scrollable Data List -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvReportTable"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp" />
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Download Button -->
+        <!-- Download PDF Button -->
         <Button
-            android:id="@+id/btnDownloadMonthly"
+            android:id="@+id/btnDownloadPdf"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Download Monthly Report"
-            android:textColor="#1A1A1A"
+            android:layout_height="60dp"
+            android:text="Download Report (PDF)"
+            android:textColor="#000000"
             android:backgroundTint="#00E676"
-            app:cornerRadius="16dp" />
+            app:cornerRadius="20dp"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
-
-
-
-
-
 

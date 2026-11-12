@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="1dp"
-    app:cardBackgroundColor="#F8F9FA">
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="16dp"
+    android:background="@android:color/transparent">
+
+    <View
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_glass_search"
+        android:layout_marginEnd="16dp" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <TextView
-                android:id="@+id/tvRecipient"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:textColor="#1A1A1A"
-                android:textSize="16sp"/>
-            <TextView
-                android:id="@+id/tvType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#757575"
-                android:textSize="12sp"/>
-        </LinearLayout>
-
+        android:layout_weight="1"
+        android:orientation="vertical">
+        
         <TextView
-            android:id="@+id/tvAmount"
+            android:id="@+id/tvRecipient"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#D32F2F"
             android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+            
+        <TextView
+            android:id="@+id/tvType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#A0AABF"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvAmount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+</LinearLayout>

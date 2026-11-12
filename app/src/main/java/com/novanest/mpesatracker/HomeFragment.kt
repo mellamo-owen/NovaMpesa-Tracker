@@ -28,17 +28,16 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         db = AppDatabase.get(requireContext())
         
-        ThemeManager.applyTheme(requireContext(), requireActivity().findViewById(android.R.id.content))
-        
+        // Setup theme button
         _binding?.btnThemeColor?.setOnClickListener {
-            val options = arrayOf("Royal & Emerald", "Ocean & Gold", "Pink & Rose Gold")
+            val options = arrayOf("Midnight Amethyst", "Ocean & Gold", "Pink & Rose Gold")
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Select Color Theme")
                 .setItems(options) { _, which ->
                     val prefs = requireContext().getSharedPreferences("theme_prefs", android.content.Context.MODE_PRIVATE)
                     prefs.edit().putInt("color_theme", which).apply()
-                    ThemeManager.applyTheme(requireContext(), requireActivity().findViewById(android.R.id.content))
-                    Toast.makeText(requireContext(), "Theme applied!", Toast.LENGTH_SHORT).show()
+                    // Instantly recreate the activity to apply the new theme
+                    requireActivity().recreate()
                 }
                 .show()
         }
@@ -47,6 +46,7 @@ class HomeFragment : Fragment() {
             val state = db.appStateDao().getState()
             if (state != null) {
                 _binding?.tvGreeting?.text = "Hello, ${state.userName}"
+                
                 val now = System.currentTimeMillis()
                 val trialEnd = state.trialStart + TimeUnit.DAYS.toMillis(60)
                 val isSubscribed = state.subscriptionExpiry != null && state.subscriptionExpiry > now
@@ -74,36 +74,29 @@ class HomeFragment : Fragment() {
 
             val allTxns = db.transactionDao().getAll().first()
             
-            // Spent totals (Exclude Loans and External Deposits)
-            val weekExp = allTxns.filter { it.timestamp >= startOfWeek && !it.isExternalDeposit && !it.isLoan }.sumOf { it.amount + it.transactionCost }
-            val monthExp = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(30)) && !it.isExternalDeposit && !it.isLoan }.sumOf { it.amount + it.transactionCost }
-            
-            // External Deposits
+            val weekExp = allTxns.filter { it.timestamp >= startOfWeek && !it.isExternalDeposit && !it.isLoan && !it.isMoneyIn }.sumOf { it.amount + it.transactionCost }
+            val monthExp = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(30)) && !it.isExternalDeposit && !it.isLoan && !it.isMoneyIn }.sumOf { it.amount + it.transactionCost }
             val deposits = allTxns.filter { it.isExternalDeposit }.sumOf { it.amount }
-            
-            // Loans Owed
             val loansOwed = allTxns.filter { it.isLoan }.sumOf { it.amount }
 
             _binding?.tvWeekTotal?.text = String.format("Ksh %,.2f", weekExp)
             _binding?.tvMonthTotal?.text = String.format("Ksh %,.2f", monthExp)
-            _binding?.tvExternalDeposits?.text = String.format("External Deposits: Ksh %,.2f", deposits)
-            _binding?.tvLoansOwed?.text = String.format("Owed to You: Ksh %,.2f", loansOwed)
+            _binding?.tvExternalDeposits?.text = String.format("Ksh %,.2f", deposits)
+            _binding?.tvLoansOwed?.text = String.format("Ksh %,.2f", loansOwed)
             
-            // Runway
             val latestBalance = allTxns.firstOrNull { it.balance != null }?.balance ?: 0.0
-            val weeklySpend = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(7)) && !it.isExternalDeposit && !it.isLoan }.sumOf { it.amount + it.transactionCost }
+            val weeklySpend = allTxns.filter { it.timestamp >= (now - TimeUnit.DAYS.toMillis(7)) && !it.isExternalDeposit && !it.isLoan && !it.isMoneyIn }.sumOf { it.amount + it.transactionCost }
             val dailyBurn = if (weeklySpend > 0) weeklySpend / 7 else 1.0
             val runwayDays = if (latestBalance > 0 && dailyBurn > 0) (latestBalance / dailyBurn).toInt() else 0
             
             if (runwayDays > 0) {
-                _binding?.tvRunway?.text = "M-Pesa Runway: $runwayDays Days"
-                _binding?.tvRunway?.setTextColor(if (runwayDays < 3) Color.parseColor("#E53935") else Color.parseColor("#00E676"))
+                _binding?.tvRunway?.text = "$runwayDays Days"
+                _binding?.tvRunway?.setTextColor(if (runwayDays < 3) Color.parseColor("#E53935") else Color.parseColor("#A3E635"))
             } else {
-                _binding?.tvRunway?.text = "M-Pesa Runway: Add a transaction"
+                _binding?.tvRunway?.text = "Add a transaction"
             }
 
-            // Chart
-            val weekTxns = allTxns.filter { it.timestamp >= startOfWeek && !it.isExternalDeposit && !it.isLoan }
+            val weekTxns = allTxns.filter { it.timestamp >= startOfWeek && !it.isExternalDeposit && !it.isLoan && !it.isMoneyIn }
             val dailyTotals = DoubleArray(7)
             for (txn in weekTxns) {
                 val txnCal = Calendar.getInstance()
@@ -120,3 +113,4 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
+

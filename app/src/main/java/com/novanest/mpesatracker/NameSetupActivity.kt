@@ -51,3 +51,5 @@ class NameSetupActivity : AppCompatActivity() {
         }
     }
 }
+
+

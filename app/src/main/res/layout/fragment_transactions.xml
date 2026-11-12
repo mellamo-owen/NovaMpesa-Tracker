@@ -1,93 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@android:color/transparent">
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Transactions"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:textColor="#FFFFFF" />
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:cardBackgroundColor="#FFFFFF">
-        
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvTransactions"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:padding="16dp" />
-    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="24dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="80dp">
 
-        <Button
-            android:id="@+id/btnLoan"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:text="Loan"
-            android:textSize="12sp"
-            android:textColor="#000000"
-            android:backgroundTint="#0A1C3A"
-            app:cornerRadius="16dp"
-            android:layout_marginEnd="4dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Transactions"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp" />
 
-        <Button
-            android:id="@+id/btnRemove"
-            android:layout_width="0dp"
+        <!-- Search Bar -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_weight="1"
-            android:text="Remove"
-            android:textSize="12sp"
-            android:textColor="#000000"
-            android:backgroundTint="#E0E0E0"
-            app:cornerRadius="16dp"
-            android:layout_marginHorizontal="4dp"/>
+            android:layout_marginHorizontal="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_glass_search">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="#A0AABF" />
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:hint="Search name or M-Pesa code"
+                    android:textColorHint="#A0AABF"
+                    android:paddingStart="12dp"
+                    android:textSize="16sp"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-        <Button
-            android:id="@+id/btnExtDeposit"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
-            android:text="Ext. Deposit"
-            android:textSize="12sp"
-            android:textColor="#000000"
-            android:backgroundTint="#00E676"
-            app:cornerRadius="16dp"
-            android:layout_marginHorizontal="4dp"/>
+        <!-- Filter Pills -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="24dp">
+                
+                <TextView
+                    android:id="@+id/pillAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All"
+                    android:background="@drawable/bg_pill_active_dark"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="10dp"
+                    android:textColor="#121212"
+                    android:textStyle="bold" />
+                    
+                <TextView
+                    android:id="@+id/pillOut"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Money out"
+                    android:background="@drawable/bg_pill_inactive_dark"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="10dp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginStart="8dp" />
+                    
+                <TextView
+                    android:id="@+id/pillIn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Money in"
+                    android:background="@drawable/bg_pill_inactive_dark"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="10dp"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+        </HorizontalScrollView>
 
-        <Button
-            android:id="@+id/btnAdd"
-            android:layout_width="0dp"
-            android:layout_height="56dp"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvTransactions"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Add"
-            android:textSize="12sp"
-            android:textColor="#000000"
-            android:backgroundTint="#00E676"
-            app:cornerRadius="16dp"
-            android:layout_marginStart="4dp"/>
+            android:clipToPadding="false"
+            android:paddingHorizontal="24dp"
+            android:paddingBottom="100dp" />
     </LinearLayout>
-</LinearLayout>
+
+    <!-- Floating Action Button for Add Expense -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="#121212"
+        app:backgroundTint="#A3E635" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

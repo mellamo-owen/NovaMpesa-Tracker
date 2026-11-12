@@ -4,16 +4,21 @@ import android.graphics.Color
 import android.view.View
 
 object ThemeManager {
-    fun applyTheme(context: Context, rootView: View) {
+    fun getThemeColor(context: Context): Int {
         val prefs = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
         val themeIndex = prefs.getInt("color_theme", 0)
         
-        val bgColor = when (themeIndex) {
-            0 -> Color.parseColor("#E2E8F0") // Royal (Soft Slate Navy/Grey)
-            1 -> Color.parseColor("#90CAF9") // Ocean (Rich Sky Blue)
-            2 -> Color.parseColor("#F48FB1") // Pink (Beautiful Blush Pink)
-            else -> Color.parseColor("#E2E8F0")
+        return when (themeIndex) {
+            0 -> Color.parseColor("#F3E8FF") // Light Lavender
+            1 -> Color.parseColor("#E0F2FE") // Light Sky Blue
+            2 -> Color.parseColor("#FCE7F3") // Light Pink
+            else -> Color.parseColor("#F3E8FF")
         }
-        rootView.setBackgroundColor(bgColor)
+    }
+
+    fun applyTheme(context: Context, rootView: View) {
+        val color = getThemeColor(context)
+        rootView.setBackgroundColor(color)
+        (context as? android.app.Activity)?.window?.decorView?.setBackgroundColor(color)
     }
 }

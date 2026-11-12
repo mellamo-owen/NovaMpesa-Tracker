@@ -38,6 +38,7 @@
         </receiver>
 
         <receiver android:name=".notifications.CategoryActionReceiver" android:exported="false" />
-        <activity android:name=".MoreCategoriesActivity" android:exported="false" />`n    </application>
+        <activity android:name=".MoreCategoriesActivity" android:exported="false" />`n            <activity android:name=".WelcomeActivity" android:exported="false" />`n    </application>
 </manifest>
+
 

@@ -27,20 +27,20 @@ class BarChartView @JvmOverloads constructor(
         super.onDraw(canvas)
         
         if (data.isEmpty() || data.all { it == 0f }) {
-            paint.color = Color.WHITE
-            paint.textSize = 40f
+            paint.color = Color.parseColor("#A0AABF")
+            paint.textSize = 36f
             paint.textAlign = Paint.Align.CENTER
             canvas.drawText("No spending this week", width / 2f, height / 2f, paint)
             return
         }
 
         val maxVal = data.maxOrNull() ?: 1f
-        val barWidth = (width.toFloat() / data.size) * 0.6f
-        val gap = (width.toFloat() / data.size) * 0.4f
-        val bottomPadding = 80f
+        val barWidth = (width.toFloat() / data.size) * 0.5f
+        val gap = (width.toFloat() / data.size) * 0.5f
+        val bottomPadding = 60f
         val maxBarHeight = height - bottomPadding - 20f
 
-        paint.textSize = 30f
+        paint.textSize = 28f
         paint.textAlign = Paint.Align.CENTER
 
         for (i in data.indices) {
@@ -50,13 +50,14 @@ class BarChartView @JvmOverloads constructor(
             val right = left + barWidth
             val bottom = height - bottomPadding
 
-            paint.color = Color.parseColor("#00E676") // Emerald
+            // Kalo Style: Lime Green Bars (Dimmed if zero)
+            paint.color = if (data[i] == 0f) Color.parseColor("#333333") else Color.parseColor("#A3E635")
             rectF.set(left, top, right, bottom)
-            canvas.drawRoundRect(rectF, 16f, 16f, paint)
+            canvas.drawRoundRect(rectF, 12f, 12f, paint)
 
             if (i < labels.size) {
-                paint.color = Color.WHITE
-                canvas.drawText(labels[i], left + (barWidth / 2), height - 30f, paint)
+                paint.color = Color.parseColor("#A0AABF")
+                canvas.drawText(labels[i], left + (barWidth / 2), height - 15f, paint)
             }
         }
     }

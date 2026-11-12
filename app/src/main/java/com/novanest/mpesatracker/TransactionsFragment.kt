@@ -1,5 +1,8 @@
 package com.novanest.mpesatracker
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +18,17 @@ import com.novanest.mpesatracker.databinding.FragmentTransactionsBinding
 import com.novanest.mpesatracker.databinding.ItemTransactionBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 class TransactionsFragment : Fragment() {
     private var _binding: FragmentTransactionsBinding? = null
     private val binding get() = _binding!!
     private lateinit var db: AppDatabase
-    private var currentList: List<Transaction> = emptyList()
+    
+    private var fullList: List<Transaction> = emptyList()
+    private var currentFilter = "All"
+    private var currentSearch = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTransactionsBinding.inflate(inflater, container, false)
@@ -34,13 +42,25 @@ class TransactionsFragment : Fragment() {
         
         viewLifecycleOwner.lifecycleScope.launch {
             db.transactionDao().getAll().collect { list ->
-                currentList = list
-                _binding?.rvTransactions?.adapter = TransactionAdapter(list)
+                fullList = list
+                applyFilters()
             }
         }
 
-        // ADD EXPENSE
-        _binding?.btnAdd?.setOnClickListener {
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                currentSearch = s.toString().lowercase()
+                applyFilters()
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.pillAll.setOnClickListener { setFilter("All") }
+        binding.pillOut.setOnClickListener { setFilter("Out") }
+        binding.pillIn.setOnClickListener { setFilter("In") }
+
+        _binding?.fabAdd?.setOnClickListener {
             val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_expense, null)
             val spinner = dialogView.findViewById<android.widget.Spinner>(R.id.spinnerCategory)
             
@@ -62,81 +82,127 @@ class TransactionsFragment : Fragment() {
 
                         if (amount != null && recipientStr.isNotBlank()) {
                             viewLifecycleOwner.lifecycleScope.launch {
-                                db.transactionDao().insert(Transaction(amount = amount, recipient = recipientStr, categoryId = selectedCategoryId, timestamp = System.currentTimeMillis(), isExternalDeposit = false, isLoan = false))
+                                db.transactionDao().insert(Transaction(amount = amount, recipient = recipientStr, categoryId = selectedCategoryId, timestamp = System.currentTimeMillis(), isExternalDeposit = false, isLoan = false, isMoneyIn = false))
                                 Toast.makeText(requireContext(), "Expense added!", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }.setNegativeButton("Cancel", null).show()
             }
         }
+    }
 
-        // ADD EXTERNAL DEPOSIT
-        _binding?.btnExtDeposit?.setOnClickListener {
-            val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_expense, null)
-            dialogView.findViewById<View>(R.id.spinnerCategory).visibility = View.GONE
-            dialogView.findViewById<View>(R.id.tvCategoryLabel)?.visibility = View.GONE
+    private fun setFilter(filter: String) {
+        currentFilter = filter
+        binding.pillAll.setBackgroundResource(R.drawable.bg_pill_inactive_dark)
+        binding.pillAll.setTextColor(Color.WHITE)
+        binding.pillOut.setBackgroundResource(R.drawable.bg_pill_inactive_dark)
+        binding.pillOut.setTextColor(Color.WHITE)
+        binding.pillIn.setBackgroundResource(R.drawable.bg_pill_inactive_dark)
+        binding.pillIn.setTextColor(Color.WHITE)
 
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setView(dialogView)
-                .setTitle("Add External Deposit")
-                .setPositiveButton("Save") { _, _ ->
-                    val amountStr = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etAmount).text.toString()
-                    val recipientStr = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etRecipient).text.toString()
-                    val amount = amountStr.toDoubleOrNull()
-
-                    if (amount != null && recipientStr.isNotBlank()) {
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            db.transactionDao().insert(Transaction(amount = amount, recipient = recipientStr, categoryId = null, timestamp = System.currentTimeMillis(), isExternalDeposit = true, isLoan = false))
-                            Toast.makeText(requireContext(), "External Deposit saved!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }.setNegativeButton("Cancel", null).show()
+        val activePill = when(filter) {
+            "All" -> binding.pillAll
+            "Out" -> binding.pillOut
+            "In" -> binding.pillIn
+            else -> binding.pillAll
         }
+        activePill.setBackgroundResource(R.drawable.bg_pill_active_dark)
+        activePill.setTextColor(Color.parseColor("#121212"))
 
-        // MARK AS LOAN
-        _binding?.btnLoan?.setOnClickListener {
-            if (currentList.isEmpty()) {
-                Toast.makeText(requireContext(), "No transactions found", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+        applyFilters()
+    }
+
+    private fun applyFilters() {
+        val filteredList = fullList.filter { txn ->
+            val matchesSearch = txn.recipient.lowercase().contains(currentSearch)
+            val matchesFilter = when(currentFilter) {
+                "In" -> txn.isMoneyIn
+                "Out" -> !txn.isMoneyIn
+                else -> true
             }
-            val items = currentList.map { "Ksh ${it.amount} - ${it.recipient}" }.toTypedArray()
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Select to Mark as Loan")
-                .setItems(items) { _, which ->
-                    val selectedTxn = currentList[which]
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        db.transactionDao().updateLoanStatus(selectedTxn.id, !selectedTxn.isLoan)
-                        val status = if (!selectedTxn.isLoan) "Marked as Loan" else "Unmarked as Loan"
-                        Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show()
-                    }
+            matchesSearch && matchesFilter
+        }
+        _binding?.rvTransactions?.adapter = TransactionAdapter(filteredList, onItemClick = { txn ->
+            showTransactionOptions(txn)
+        })
+    }
+
+    private fun showTransactionOptions(txn: Transaction) {
+        val options = arrayOf(
+            "Set Category (Food, Transport, etc.)",
+            if (txn.isExternalDeposit) "Unmark External Deposit" else "Mark as External Deposit",
+            if (txn.isLoan) "Unmark Loan" else "Mark as Loan",
+            "Delete Transaction"
+        )
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("${txn.recipient} - Ksh ${txn.amount}")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> showCategorySelector(txn)
+                    1 -> toggleExternalDeposit(txn)
+                    2 -> toggleLoan(txn)
+                    3 -> deleteTransaction(txn)
                 }
-                .show()
-        }
-
-        // REMOVE
-        _binding?.btnRemove?.setOnClickListener {
-            if (currentList.isEmpty()) {
-                Toast.makeText(requireContext(), "No transactions to remove", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
             }
-            val items = currentList.map { "Ksh ${it.amount} - ${it.recipient}" }.toTypedArray()
+            .show()
+    }
+
+    private fun showCategorySelector(txn: Transaction) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val categories = db.categoryDao().getAll().first()
+            val categoryNames = categories.map { it.name }.toTypedArray()
+            
             androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Select to Remove")
-                .setItems(items) { _, which ->
-                    val selectedTxn = currentList[which]
+                .setTitle("Select Category")
+                .setItems(categoryNames) { _, which ->
                     viewLifecycleOwner.lifecycleScope.launch {
-                        db.transactionDao().deleteById(selectedTxn.id)
-                        Toast.makeText(requireContext(), "Removed", Toast.LENGTH_SHORT).show()
+                        db.transactionDao().updateCategory(txn.id, categories[which].id)
+                        Toast.makeText(requireContext(), "Categorized as ${categories[which].name}", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .show()
         }
     }
 
+    private fun toggleExternalDeposit(txn: Transaction) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            db.transactionDao().updateDepositStatus(txn.id, !txn.isExternalDeposit)
+            val status = if (!txn.isExternalDeposit) "Marked as External Deposit" else "Unmarked External Deposit"
+            Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun toggleLoan(txn: Transaction) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            db.transactionDao().updateLoanStatus(txn.id, !txn.isLoan)
+            val status = if (!txn.isLoan) "Marked as Loan" else "Unmarked Loan"
+            Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun deleteTransaction(txn: Transaction) {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Delete Transaction?")
+            .setMessage("Are you sure you want to delete this transaction?")
+            .setPositiveButton("Delete") { _, _ ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    db.transactionDao().deleteById(txn.id)
+                    Toast.makeText(requireContext(), "Transaction Deleted", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     override fun onDestroyView() { super.onDestroyView(); _binding = null }
 }
 
-class TransactionAdapter(private val list: List<Transaction>) : RecyclerView.Adapter<TransactionAdapter.ViewHolder>() {
+class TransactionAdapter(
+    private val list: List<Transaction>,
+    private val onItemClick: (Transaction) -> Unit
+) : RecyclerView.Adapter<TransactionAdapter.ViewHolder>() {
+
     class ViewHolder(val binding: ItemTransactionBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -148,14 +214,30 @@ class TransactionAdapter(private val list: List<Transaction>) : RecyclerView.Ada
         holder.binding.tvRecipient.text = txn.recipient
         
         val typeStr = when {
+            txn.isMoneyIn -> "Received"
             txn.isExternalDeposit -> "External Deposit"
             txn.isLoan -> "Loan"
-            else -> "Expense"
+            else -> "Send money"
         }
-        val costStr = if (txn.transactionCost > 0) " (Fee: ${txn.transactionCost})" else ""
-        holder.binding.tvType.text = "$typeStr$costStr"
+        val costStr = if (txn.transactionCost > 0 && !txn.isMoneyIn) " • Fee: Ksh ${txn.transactionCost}" else ""
         
-        holder.binding.tvAmount.text = String.format("Ksh %,.2f", txn.amount)
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        val timeStr = sdf.format(Date(txn.timestamp))
+        
+        holder.binding.tvType.text = "$timeStr • $typeStr$costStr"
+        
+        if (txn.isMoneyIn) {
+            holder.binding.tvAmount.text = "+Ksh ${txn.amount}"
+            holder.binding.tvAmount.setTextColor(Color.parseColor("#00E676"))
+        } else {
+            holder.binding.tvAmount.text = "-Ksh ${txn.amount}"
+            holder.binding.tvAmount.setTextColor(Color.WHITE)
+        }
+
+        // MAKE ITEM CLICKABLE
+        holder.itemView.setOnClickListener {
+            onItemClick(txn)
+        }
     }
 
     override fun getItemCount() = list.size

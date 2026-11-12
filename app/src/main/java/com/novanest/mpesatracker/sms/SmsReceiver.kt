@@ -13,24 +13,42 @@ import kotlinx.coroutines.launch
 class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
+        
         val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
         for (msg in messages) {
             val body = msg.messageBody ?: continue
+            val sender = msg.originatingAddress ?: ""
+            
+            // Only process M-Pesa messages
+            if (!sender.contains("MPESA", ignoreCase = true)) continue
+
             val parsed = MpesaParser.parse(body) ?: continue
 
             val db = AppDatabase.get(context)
             CoroutineScope(Dispatchers.IO).launch {
-                val txnId = db.transactionDao().insert(
-                    Transaction(
-                        amount = parsed.amount,
-                        recipient = parsed.recipient,
-                        categoryId = null,
-                        timestamp = parsed.timestamp,
-                        isExternalDeposit = false,
-                        transactionCost = parsed.transactionCost
+                try {
+                    // 1. Save to database
+                    val txnId = db.transactionDao().insert(
+                        Transaction(
+                            amount = parsed.amount,
+                            recipient = parsed.recipient,
+                            categoryId = null,
+                            timestamp = parsed.timestamp,
+                            isExternalDeposit = false,
+                            isLoan = false,
+                            isMoneyIn = parsed.isMoneyIn,
+                            transactionCost = parsed.transactionCost
+                        )
                     )
-                )
-                NotificationHelper.showTransactionNotification(context, txnId, parsed.amount, parsed.recipient)
+                    
+                    // 2. Show notification ONLY for Money Out
+                    if (!parsed.isMoneyIn) {
+                        NotificationHelper.showTransactionNotification(context, txnId, parsed.amount, parsed.recipient)
+                    }
+                } catch (e: Exception) {
+                    // Catch DB errors to prevent app crash in background
+                    e.printStackTrace()
+                }
             }
         }
     }

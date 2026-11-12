@@ -1,0 +1,6 @@
+<resources>
+    <style name="BottomNavTextAppearance" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

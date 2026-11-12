@@ -1,10 +1,9 @@
 <resources>
-    <style name="Theme.MPesaExpenseTracker" parent="Theme.Material3.Light.NoActionBar">
-        <item name="colorPrimary">@color/royal_blue</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorSecondary">@color/emerald</item>
-        <item name="android:windowBackground">@color/bg_offwhite</item>
-        <item name="android:statusBarColor">@color/royal_blue</item>
-        <item name="android:forceDarkAllowed">false</item>
+    <style name="Theme.MPesaExpenseTracker" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#A3E635</item> <!-- Neon Lime -->
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorSecondary">#F97316</item> <!-- Orange Accent -->
+        <item name="android:windowBackground">#121212</item> <!-- Matte Black -->
+        <item name="android:statusBarColor">#121212</item>
     </style>
 </resources>

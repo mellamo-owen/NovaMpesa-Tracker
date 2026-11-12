@@ -16,6 +16,17 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // APPLY THE SAVED THEME TO THE ROOT LAYOUT
+        val prefs = getSharedPreferences("theme_prefs", MODE_PRIVATE)
+        val themeIndex = prefs.getInt("color_theme", 0)
+        val color = when (themeIndex) {
+            0 -> android.graphics.Color.parseColor("#1A0B2E")
+            1 -> android.graphics.Color.parseColor("#0D2137")
+            2 -> android.graphics.Color.parseColor("#2D0A1F")
+            else -> android.graphics.Color.parseColor("#1A0B2E")
+        }
+        binding.mainRoot.setBackgroundColor(color)
+
         if (intent.getBooleanExtra("SHOW_MORE_CATEGORIES", false)) {
             val txnId = intent.getLongExtra("TXN_ID", -1L)
             val intentToMore = Intent(this, MoreCategoriesActivity::class.java)
@@ -40,25 +51,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun askForBatteryOptimization() {
-        val pm = getSystemService(POWER_SERVICE) as PowerManager
-        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-            try {
+        try {
+            val pm = getSystemService(POWER_SERVICE) as PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
                 val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
                 intent.data = Uri.parse("package:$packageName")
                 startActivity(intent)
-            } catch (e: Exception) {
-                startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
             }
-        }
+        } catch (e: Exception) { }
     }
 
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .commit()
-        // Apply theme on page change
-        binding.root.post {
-            ThemeManager.applyTheme(this, binding.root)
-        }
     }
 }
