@@ -73,7 +73,16 @@ class ReportsFragment : Fragment() {
             it.timestamp >= startOfMonth && !it.isMoneyIn 
         }.sumOf { it.transactionCost }
 
-        _binding?.tvTotalSpent?.text = String.format("Ksh %,.2f", totalSpent)
+        
+        val leakage = allTxns.filter { 
+            it.timestamp >= startOfMonth && 
+            it.amount < 200 && 
+            !it.isExternalDeposit && 
+            !it.isLoan && 
+            !it.isMoneyIn 
+        }.sumOf { it.amount + it.transactionCost }
+
+        _binding?.tvLeakage?.text = String.format("Ksh %,.2f", leakage)
         _binding?.tvTotalCosts?.text = String.format("Ksh %,.2f", totalCosts)
 
         // Update Bar Chart
@@ -225,4 +234,6 @@ class ReportAdapter(private val list: List<Transaction>) : RecyclerView.Adapter<
 
     override fun getItemCount() = list.size
 }
+
+
 
